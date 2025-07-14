@@ -1,0 +1,204 @@
+model_class: SNDModel
+input_variables:
+  energy:
+    variable_class: ScalarVariable
+    default_value: 9500
+    is_constant: false
+    value_range: [8000, 10000]
+    value_range_tolerance: 1.0e-08
+  delay:
+    variable_class: ScalarVariable
+    default_value: 0.28
+    is_constant: false
+    value_range: [0.0, 1.0]
+    value_range_tolerance: 1.0e-08
+  t1_tth:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_th1:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_th2:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_th2:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_th1:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_tth:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_L:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_L:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_chi1:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_chi2:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_chi1:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_chi2:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_x:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t2_x:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t3_x:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_x:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t2_th:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t3_th:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_y1:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t1_y2:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_y1:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+  t4_y2:
+    variable_class: ScalarVariable
+    default_value: 1.0e-06
+    is_constant: false
+    value_range: [-0.0001, 0.0001]
+    value_range_tolerance: 1.0e-08
+output_variables:
+  t1_dh_sum:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  dd_sum:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  t4_dh_sum:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  do_sum:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  dd_cx:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  do_cx:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  dd_cy:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  do_cy:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  IP_sum:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  IP_cx:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+  IP_cy:
+    variable_class: ScalarVariable
+    is_constant: false
+    value_range: [-.inf, .inf]
+    value_range_tolerance: 1.0e-08
+input_validation_config: null
+output_validation_config: null

@@ -1,0 +1,3 @@
+k2eg
+lume-model[torch]
+lcls_beamline_toolbox @ git+https://github.com/mseaberg/lcls_beamline_toolbox.git@master

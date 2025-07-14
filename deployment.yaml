@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snd-model-deployment
+  labels:
+    app: snd-model
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snd-model
+  template:
+    metadata:
+      labels:
+        app: snd-model
+    spec:
+      containers:
+      - name: snd-model
+        image: scr.svc.stanford.edu/smiskov/snd-model:0.3
+        imagePullPolicy: Always
