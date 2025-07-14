@@ -1,6 +1,15 @@
 # Split and Delay Model for Online Deployment
 This is the repository for online deployment of the split and delay model. It's still under development. 
 
+## To check deployment
+First set up kubectl by following the instructions in this [link](https://k8s.slac.stanford.edu/ad-accel-online-ml).
+To see the deployment logs of the container, you can use the following commands to get the name of the snd-model pod 
+that's running, and then view the logs:
+```bash
+kubectl get pods
+kubectl logs -f <pod-name>
+```
+
 ## Docker image deployment on Kubernetes (S3DF)
 To deploy the Docker image on Kubernetes, follow these steps. If you have updated the tag,
 make sure to replace `<tag>` with the new tag in the commands below, **and in the deployment YAML file**.
