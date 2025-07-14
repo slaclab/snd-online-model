@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <deployment-name>
+  labels:
+    app: <app-name>
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: <app-name>
+  template:
+    metadata:
+      labels:
+        app: <app-name>
+    spec:
+      containers:
+      - name: <image-name>
+        image: scr.svc.stanford.edu/<username>/<image-name>:<tag>
+        imagePullPolicy: Always
+        command: ["/bin/bash", "-c", "--"]
+        args: ["while true; do sleep 30; done;"]
