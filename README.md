@@ -1,9 +1,7 @@
-# Split and Deplay Model for Online Deployment
-Split and Delay Model for Online Deployment
+# Split and Delay Model for Online Deployment
+This is the repository for online deployment of the split and delay model. It's still under development. 
 
 ## Docker image deployment on Kubernetes (S3DF)
-For more detailed instructions, refer to this [documentation](https://github.com/slaclab/lcls_cu_injector_ml_model?tab=readme-ov-file#containerization-steps).
-
 To deploy the Docker image on Kubernetes, follow these steps. If you have updated the tag,
 make sure to replace `<tag>` with the new tag in the commands below, **and in the deployment YAML file**.
 
@@ -12,14 +10,17 @@ make sure to replace `<tag>` with the new tag in the commands below, **and in th
 2. Build the Docker image. The `platform` tag is necessary if you are developing on a machine with a different architecture. 
 If you are NOT building on a MacOS machine, you can skip the `--provenance` flag.
    ```bash
-   docker build -t <image-name>:<tag> . --platform=linux/amd64 --provenance=false
+   docker build -t snd-model:<tag> . --platform=linux/amd64 --provenance=false
    ```
 2. Push the Docker image to the Stanford Container Registry (replace `<your-username>` with your actual username):
     ```bash
     cat ~/.scr-token | docker login --username $USER --password-stdin http://scr.svc.stanford.edu
-    docker tag <image-name>:<tag> scr.svc.stanford.edu/<your-username>/<image-name>:<tag>
-    docker push scr.svc.stanford.edu/<your-username>/<image-name>:<tag>
+    docker tag snd-model:<tag> scr.svc.stanford.edu/<your-username>/snd-model:<tag>
+    docker push scr.svc.stanford.edu/<your-username>/snd-model:<tag>
     ```
+   
+For more detailed instructions, refer to this [documentation](https://github.com/slaclab/lcls_cu_injector_ml_model?tab=readme-ov-file#containerization-steps).
+
 3. To set up kubectl, follow this [link](https://k8s.slac.stanford.edu/ad-accel-online-ml). Update the Kubernetes deployment with the new image:
     ```bash
     kubectl apply -f deployment.yaml
