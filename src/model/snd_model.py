@@ -7,9 +7,18 @@ inputs = np.zeros(22)
 
 class SNDModel(LUMEBaseModel):
     def _evaluate(self, input_dict):
+        # the following line places motors to "default positions" based on the photon energy 
+        # and delay. Those positions can be compared to the current PV readbacks.
         snd = SND(input_dict["energy"], delay=input_dict["delay"])
         del input_dict["energy"]
         del input_dict["delay"]
+        ### the following can be uncommented after initial testing, and serves as a starting point where
+        ### the PVs can be used for defining motor positions.
+        # for name, motor in snd.motor_dict.items():
+            # default_pos = motor.wm()
+            # pv_pos = input_dict[name]
+            # motor.mvr(pv_pos - default_pos)
+        
         for i, motor in enumerate(snd.motor_list):
             motor.mv(motor.wm() + list(input_dict.values())[i])
         snd.propagate_delay()
