@@ -21,19 +21,21 @@ jobs:
         run: |
           echo "REPO_LC=${REPO,,}" >>${GITHUB_ENV}
           echo "USERNAME_LC=${USERNAME,,}" >>${GITHUB_ENV}
-      - name: Get latest semantic version tag and increment
-        id: get_tag
-        run: |
-          TAGS=$(curl -s -u $USERNAME_LC:${{ secrets.SCR_TOKEN }} "https://scr.svc.stanford.edu/v2/$USERNAME_LC/snd-model/tags/list" | jq -r '.tags[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
-          if [ -z "$TAGS" ]; then
-            NEW_TAG="1.0.0"
-          else
-            LAST_TAG=$(echo "$TAGS" | tail -n 1)
-            IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_TAG"
-            PATCH=$((PATCH + 1))
-            NEW_TAG="$MAJOR.$MINOR.$PATCH"
-          fi
-          echo "IMAGE_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+#      - name: Get latest semantic version tag and increment
+#        # NOTE: does not work with SCR, keep for updating to GitHub Container Registry
+#        id: get_tag
+#        run: |
+#          TAGS=$(curl -s -u $USERNAME_LC:${{ secrets.SCR_TOKEN }} "https://scr.svc.stanford.edu/v2/$USERNAME_LC/snd-model/tags/list" | jq -r '.tags[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+#          if [ -z "$TAGS" ]; then
+#            NEW_TAG="1.0.0"
+#          else
+#            LAST_TAG=$(echo "$TAGS" | tail -n 1)
+#            IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_TAG"
+#            PATCH=$((PATCH + 1))
+#            NEW_TAG="$MAJOR.$MINOR.$PATCH"
+#          fi
+#          echo "IMAGE_TAG=$NEW_TAG" >> $GITHUB_ENV
 
       - name: Checkout code
         uses: actions/checkout@v3
