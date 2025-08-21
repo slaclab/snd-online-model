@@ -1,0 +1,81 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: true
+        default: 'latest'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+      REGISTRY: scr.svc.stanford.edu
+      REPO: ${{ secrets.SCR_USERNAME }}/snd-model
+    steps:
+      - name: Get latest semantic version tag and increment
+        id: get_tag
+        run: |
+          TAGS=$(curl -s -u ${{ secrets.SCR_USERNAME }}:${{ secrets.SCR_TOKEN }} "https://scr.svc.stanford.edu/v2/${{ secrets.SCR_USERNAME }}/snd-model/tags/list" | jq -r '.tags[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+          if [ -z "$TAGS" ]; then
+            NEW_TAG="1.0.0"
+          else
+            LAST_TAG=$(echo "$TAGS" | tail -n 1)
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_TAG"
+            PATCH=$((PATCH + 1))
+            NEW_TAG="$MAJOR.$MINOR.$PATCH"
+          fi
+          echo "IMAGE_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Update deployment.yaml image tag
+        run: |
+          sed -i "s|image: .\+/snd-model:.*|image: $REGISTRY/$REPO:$IMAGE_TAG|" deployment.yaml
+
+      - name: Commit updated deployment.yaml
+        run: |
+          git add deployment.yaml
+          git commit -m "Update deployment.yaml image tag to $IMAGE_TAG" || echo "No changes to commit"
+
+      - name: Push changes to repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin HEAD:${{ github.ref }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Stanford Container Registry
+        run: echo "${{ secrets.SCR_TOKEN }}" | docker login --username ${{ secrets.SCR_USERNAME }} --password-stdin http://scr.svc.stanford.edu
+
+      - name: Build Docker image
+        run: |
+          docker build -t snd-model:$IMAGE_TAG . --platform=linux/amd64 --provenance=false
+          docker tag snd-model:$IMAGE_TAG $REGISTRY/$REPO:$IMAGE_TAG
+
+      - name: Push Docker image
+        run: docker push $REGISTRY/$REPO:$IMAGE_TAG
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+
+      - name: Apply deployment
+        run: kubectl apply -f deployment.yaml
+
