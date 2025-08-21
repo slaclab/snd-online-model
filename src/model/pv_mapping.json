@@ -1,4 +1,6 @@
 {
+    "energy": "XCS:SND:CALC:E1",
+    "delay": "XCS:SND:CALC:Delay",
     "t1_tth": "XCS:SND:T1:TTH.RBV",
     "t1_th1": "XCS:SND:T1:TH1.RBV",
     "t1_th2": "XCS:SND:T1:TH2.RBV",

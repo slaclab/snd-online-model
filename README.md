@@ -30,7 +30,7 @@ If you are NOT building on a MacOS machine, you can skip the `--provenance` flag
    
 For more detailed instructions, refer to this [documentation](https://github.com/slaclab/lcls_cu_injector_ml_model?tab=readme-ov-file#containerization-steps).
 
-3. To set up kubectl, follow this [link](https://k8s.slac.stanford.edu/ad-accel-online-ml). Update the Kubernetes deployment with the new image:
+3. To set up kubectl, follow this [link](https://k8s.slac.stanford.edu/lcls-ml-online). Update the Kubernetes deployment with the new image:
     ```bash
     kubectl apply -f deployment.yaml
     ```

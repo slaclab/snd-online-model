@@ -14,133 +14,133 @@ input_variables:
     value_range_tolerance: 1.0e-08
   t1_tth:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.6935635
     is_constant: false
-    value_range: [-0.0001, 0.0001]
+    value_range: [0.6934635, 0.6936635]
     value_range_tolerance: 1.0e-08
   t1_th1:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.3467818
     is_constant: false
-    value_range: [-0.0001, 0.0001]
+    value_range: [0.3466818, 0.3468818]
     value_range_tolerance: 1.0e-08
   t1_th2:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.3467818
     is_constant: false
-    value_range: [-0.0001, 0.0001]
+    value_range: [0.3466818, 0.3468818]
     value_range_tolerance: 1.0e-08
   t4_th2:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.3467818
     is_constant: false
-    value_range: [-0.0001, 0.0001]
+    value_range: [0.3466818, 0.3468818]
     value_range_tolerance: 1.0e-08
   t4_th1:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.3467818
     is_constant: false
-    value_range: [-0.0001, 0.0001]
+    value_range: [0.3466818, 0.3468818]
     value_range_tolerance: 1.0e-08
   t4_tth:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.6935635
     is_constant: false
-    value_range: [-0.0001, 0.0001]
+    value_range: [0.6934635, 0.6936635]
     value_range_tolerance: 1.0e-08
   t1_L:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t4_L:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t1_chi1:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t1_chi2:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t4_chi1:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t4_chi2:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t1_x:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t2_x:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t3_x:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t4_x:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t2_th:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t3_th:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t1_y1:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t1_y2:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t4_y1:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
   t4_y2:
     variable_class: ScalarVariable
-    default_value: 1.0e-06
+    default_value: 0.0
     is_constant: false
     value_range: [-0.0001, 0.0001]
     value_range_tolerance: 1.0e-08
