@@ -16,6 +16,9 @@ jobs:
       REGISTRY: scr.svc.stanford.edu
       REPO: ${{ secrets.SCR_USERNAME }}/snd-model
     steps:
+      - name: Set lower case repo username name
+        run: |
+          echo "REPO_LC=${REPO,,}" >>${GITHUB_ENV}
       - name: Get latest semantic version tag and increment
         id: get_tag
         run: |
@@ -40,7 +43,7 @@ jobs:
 
       - name: Update deployment.yaml image tag
         run: |
-          sed -i "s|image: .\+/snd-model:.*|image: $REGISTRY/$REPO:$IMAGE_TAG|" deployment.yaml
+          sed -i "s|image: .\+/snd-model:.*|image: $REGISTRY/$REPO_LC:$IMAGE_TAG|" deployment.yaml
 
       - name: Commit updated deployment.yaml
         run: |
@@ -62,10 +65,10 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t snd-model:$IMAGE_TAG . --platform=linux/amd64 --provenance=false
-          docker tag snd-model:$IMAGE_TAG $REGISTRY/$REPO:$IMAGE_TAG
+          docker tag snd-model:$IMAGE_TAG $REGISTRY/$REPO_LC:$IMAGE_TAG
 
       - name: Push Docker image
-        run: docker push $REGISTRY/$REPO:$IMAGE_TAG
+        run: docker push $REGISTRY/$REPO_LC:$IMAGE_TAG
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
