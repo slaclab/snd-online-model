@@ -15,11 +15,16 @@ jobs:
       IMAGE_TAG: ${{ github.event.inputs.image_tag }}
       REGISTRY: scr.svc.stanford.edu
       REPO: ${{ secrets.SCR_USERNAME }}/snd-model
+      USERNAME: ${{ secrets.SCR_USERNAME }}
     steps:
+      - name: Set lower case repo username name
+        run: |
+          echo "REPO_LC=${REPO,,}" >>${GITHUB_ENV}
+          echo "USERNAME_LC=${USERNAME,,}" >>${GITHUB_ENV}
       - name: Get latest semantic version tag and increment
         id: get_tag
         run: |
-          TAGS=$(curl -s -u ${{ secrets.SCR_USERNAME }}:${{ secrets.SCR_TOKEN }} "https://scr.svc.stanford.edu/v2/${{ secrets.SCR_USERNAME }}/snd-model/tags/list" | jq -r '.tags[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+          TAGS=$(curl -s -u $USERNAME_LC:${{ secrets.SCR_TOKEN }} "https://scr.svc.stanford.edu/v2/$USERNAME_LC/snd-model/tags/list" | jq -r '.tags[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
           if [ -z "$TAGS" ]; then
             NEW_TAG="1.0.0"
           else
@@ -40,7 +45,7 @@ jobs:
 
       - name: Update deployment.yaml image tag
         run: |
-          sed -i "s|image: .\+/snd-model:.*|image: $REGISTRY/$REPO:$IMAGE_TAG|" deployment.yaml
+          sed -i "s|\(image: .*/snd-model:\).*|\1$IMAGE_TAG|" deployment.yaml
 
       - name: Commit updated deployment.yaml
         run: |
@@ -57,15 +62,15 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Stanford Container Registry
-        run: echo "${{ secrets.SCR_TOKEN }}" | docker login --username ${{ secrets.SCR_USERNAME }} --password-stdin http://scr.svc.stanford.edu
+        run: echo "${{ secrets.SCR_TOKEN }}" | docker login --username USERNAME_LC --password-stdin http://scr.svc.stanford.edu
 
       - name: Build Docker image
         run: |
           docker build -t snd-model:$IMAGE_TAG . --platform=linux/amd64 --provenance=false
-          docker tag snd-model:$IMAGE_TAG $REGISTRY/$REPO:$IMAGE_TAG
+          docker tag snd-model:$IMAGE_TAG $REGISTRY/$REPO_LC:$IMAGE_TAG
 
       - name: Push Docker image
-        run: docker push $REGISTRY/$REPO:$IMAGE_TAG
+        run: docker push $REGISTRY/$REPO_LC:$IMAGE_TAG
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
