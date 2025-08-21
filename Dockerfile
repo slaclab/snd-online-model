@@ -7,6 +7,10 @@ ENV PYTHONUNBUFFERED=1
 # Uncomment if you need to use k2eg to communicate with EPICS
 # ENV K2EG_PYTHON_CONFIGURATION_PATH_FOLDER=/app/config
 
+# Set EPICS environment variables
+ENV EPICS_CA_AUTO_ADDR_LIST=NO
+ENV EPICS_CA_ADDR_LIST=172.24.3.10:5068
+
 # Install system dependencies, then clean up
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -24,9 +28,3 @@ RUN pip install --upgrade pip && \
     rm -rf /root/.cache
 
 COPY . .
-
-# Set working directory to the folder where code lives
-WORKDIR /app/src
-
-# Default command to run script
-CMD ["python", "-u", "run_example.py"]

@@ -19,6 +19,7 @@ class SNDModel(LUMEBaseModel):
             energy=self.input_variables[0].default_value,
             delay=self.input_variables[1].default_value
         )
+        self.pv_map = self.pv_mapping() # TODO: move this somewhere more static
 
     def initialize_model(self, energy=10000, delay=0):
         """Initialize the model with default values for energy and delay."""
@@ -29,7 +30,7 @@ class SNDModel(LUMEBaseModel):
 
     def pv_mapping(self):
         """Loads  the PV mapping from json file."""
-        with open('pv_mapping.json', 'r') as file:
+        with open('model/pv_mapping.json', 'r') as file:
             pv_mapping = json.load(file)
         return pv_mapping
 

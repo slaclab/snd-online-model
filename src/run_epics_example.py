@@ -21,7 +21,7 @@ def setup():
     # and instantiate the SNDModel using default configuration
     snd_model = SNDModel("model/snd_model.yml")
     # Get PV names from the mapping
-    input_pvs = [snd_model.pv_mapping[n] for n in snd_model.input_names]
+    input_pvs = [snd_model.pv_map[n] for n in snd_model.input_names]
 
     # Instantiate an interface for I/O operations
     interface = EPICSInterface()
@@ -41,13 +41,21 @@ def run_iteration(snd_model, interface, input_pvs):
     energy_change_threshold = 100  # eV
     if abs(input_dict['energy'] - snd_model.input_variables['energy'].default_value) > energy_change_threshold:
         logger.info("Energy has changed significantly, reinstantiating model.")
-        logger.info(f"Default energy: {snd_model.input_variables['energy'].default_value}.")
+        logger.info(f"Default energy: {snd_model.input_variables[0].default_value}.")
         logger.info(f"Input energy: {input_dict['energy']}.")
-        # TODO: Do the same for delay. For now, we use the default value.
-        snd_model.initialize_model(input_dict['energy'], snd_model.input_variables[1].default_value)
-        # Set new default energy
+        # TODO: Do the same for delay. For now use the input value for delay
+        snd_model.initialize_model(input_dict['energy'], input_dict['delay'])
+        # Set new default energy and delay
         snd_model.input_variables[0].default_value = input_dict['energy']
+        snd_model.input_variables[1].default_value = input_dict['delay']
         logger.info(f"New default energy is {snd_model.input_variables[0].default_value}.")
+        logger.info(f"New delay is {snd_model.input_variables[1].default_value}.")
+
+        # Update default value for each motor /each input based on new energy
+        # this is needed here for validation of the input range (will only throw a warning)
+        for name, motor in snd_model.snd.motor_dict.items():
+            snd_model.input_variables[snd_model.input_names.index(name)].default_value = motor.wm()
+            snd_model.input_variables[snd_model.input_names.index(name)].value_range = [motor.wm()-0.0001, motor.wm()+0.0001]
 
     # Evaluate the model with the random input
     output = snd_model.evaluate(input_dict)
@@ -56,7 +64,7 @@ def run_iteration(snd_model, interface, input_pvs):
 
 if __name__ == "__main__":
     snd_model, interface, input_pvs = setup()
-    logger.info("Starting SNDModel example with K2EG interface...")
+    logger.info("Starting SNDModel example with EPICS interface...")
     while True:
         try:
             run_iteration(snd_model, interface, input_pvs)
