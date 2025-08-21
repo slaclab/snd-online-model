@@ -43,7 +43,7 @@ jobs:
 
       - name: Update deployment.yaml image tag
         run: |
-          sed -i "s|image: .\+/snd-model:.*|image: $REGISTRY/$REPO_LC:$IMAGE_TAG|" deployment.yaml
+          sed -i "s|\(image: .*/snd-model:\).*|\1$IMAGE_TAG|" deployment.yaml
 
       - name: Commit updated deployment.yaml
         run: |
