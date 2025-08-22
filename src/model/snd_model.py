@@ -23,25 +23,76 @@ class SNDModel(LUMEBaseModel):
         self.pv_map = None
 
     def initialize_model(self, energy=10000, delay=0):
-        """Initialize the model with default values for energy and delay."""
-        # the following line places motors to "default positions" based on the photon energy
-        # and delay. Those positions can be compared to the current PV readbacks.
+        """
+        Initialize the model with default values for energy and delay.
+
+        Parameters
+        ----------
+        energy : float, optional
+            Photon energy value to initialize the model (default is 10000).
+        delay : float, optional
+            Delay value to initialize the model (default is 0).
+
+        Returns
+        -------
+        SND
+            The initialized SND model instance.
+        """
         self.snd = SND(energy, delay)
         return self.snd
 
     def input_transform(self, input_dict):
-        """Transform input dictionary values from PV units to sim units."""
+        """
+        Transform input dictionary values from PV units to simulation units.
+
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary of input variable names and their values in PV units.
+
+        Returns
+        -------
+        dict
+            Dictionary of input variable names and their values in simulation units.
+        """
         return {
             name: value * self.pv_map["unit_conversion"][name]
             for name, value in input_dict.items()
         }
 
     def output_transform(self, output_dict):
-        """Transform output dictionary values from sim units to PV units."""
+        """
+        Transform output dictionary values from simulation units to PV units.
+
+        Parameters
+        ----------
+        output_dict : dict
+            Dictionary of output variable names and their values in simulation units.
+
+        Returns
+        -------
+        dict
+            Dictionary of output variable names and their values in PV units.
+        """
         # TODO: Not sure if any transformation is needed here. Remove if not needed.
         return output_dict
 
     def _evaluate(self, input_dict, transform=True):
+        """
+        Evaluate the SND model with the given input dictionary.
+
+        Parameters
+        ----------
+        input_dict : dict
+            Dictionary of input variable names and their values.
+        transform : bool, optional
+            Whether to transform input values from PV units to simulation units (default is True).
+
+        Returns
+        -------
+        dict
+            Dictionary of output variable names and their evaluated values.
+        """
         if transform:
             input_dict = self.input_transform(input_dict)
 

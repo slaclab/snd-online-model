@@ -46,7 +46,22 @@ def pv_mapping():
 
 def run_iteration(snd_model, interface, input_vars, interface_name):
     """
-    Run a single iteration of the example, evaluating the SNDModel with input from the interface.
+    Run a single iteration of the SNDModel evaluation using the specified interface.
+
+    Parameters
+    ----------
+    snd_model : SNDModel
+        The SNDModel instance to evaluate.
+    interface : object
+        The interface instance (TestInterface or EPICSInterface) for input retrieval.
+    input_vars : list
+        List of input variable names or PVs, depending on the interface.
+    interface_name : str
+        The name of the interface to use ('test' or 'epics').
+
+    Returns
+    -------
+    None
     """
     # Get the input variable from the interface
     input_dict = interface.get_input_variables(input_vars)
@@ -110,6 +125,20 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
 
 
 def main():
+    """
+    Main entry point for running the SNDModel application with CLI interface selection.
+
+    Parses command-line arguments to select the interface, initializes the model and interface,
+    and runs the evaluation loop.
+
+    You can run the script with:
+        python run.py --interface test
+        python run.py --interface epics
+
+    Returns
+    -------
+    None
+    """
     parser = argparse.ArgumentParser(
         description="Run SNDModel with selected interface."
     )

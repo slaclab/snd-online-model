@@ -20,8 +20,15 @@ class EPICSInterface:
         """
         Get the value of a Process Variable (PV) from EPICS.
 
-        :param pv_name: The name of the PV to retrieve.
-        :return: The value of the PV.
+        Parameters
+        ----------
+        pv_name : str
+            The name of the PV to retrieve.
+
+        Returns
+        -------
+        value
+            The value of the PV.
         """
         return caget(pv_name)
 
@@ -29,7 +36,14 @@ class EPICSInterface:
         """
         Retrieves the input variables from EPICS.
 
-        :param input_pvs: A list of input variable names to retrieve.
-        :return: A dictionary with PV names as keys and their values as values.
+        Parameters
+        ----------
+        input_pvs : list of str
+            A list of input variable names to retrieve.
+
+        Returns
+        -------
+        dict
+            A dictionary with PV names as keys and their values as values.
         """
         return {pv: self.get_value(pv) for pv in input_pvs}
