@@ -39,7 +39,7 @@ def run_iteration(snd_model, interface, input_pvs):
 
     # Check if energy has changed too much from the default value
     energy_change_threshold = 100  # eV
-    if abs(input_dict['energy'] - snd_model.input_variables['energy'].default_value) > energy_change_threshold:
+    if abs(input_dict['energy'] - snd_model.input_variables[0].default_value) > energy_change_threshold:
         logger.info("Energy has changed significantly, reinstantiating model.")
         logger.info(f"Default energy: {snd_model.input_variables[0].default_value}.")
         logger.info(f"Input energy: {input_dict['energy']}.")
