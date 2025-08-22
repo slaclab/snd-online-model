@@ -21,7 +21,7 @@ def setup():
     # and instantiate the SNDModel using default configuration
     snd_model = SNDModel("model/snd_model.yml")
     # Get PV names from the mapping
-    input_pvs = [snd_model.pv_map[n] for n in snd_model.input_names]
+    input_pvs = [snd_model.pv_map["name"][n] for n in snd_model.input_names]
 
     # Instantiate an interface for I/O operations
     interface = EPICSInterface()

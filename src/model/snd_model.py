@@ -34,7 +34,21 @@ class SNDModel(LUMEBaseModel):
             pv_mapping = json.load(file)
         return pv_mapping
 
+    def input_transform(self, input_dict):
+        """Transform input dictionary values from PV units to sim units."""
+        return {
+            name: value * self.pv_map['unit_conversion'][name]
+            for name, value in input_dict.items()
+        }
+
+    def output_transform(self, output_dict):
+        """Transform output dictionary values from sim units to PV units."""
+        # TODO: Not sure if any transformation is needed here. Remove if not needed.
+        return output_dict
+
     def _evaluate(self, input_dict):
+        input_dict = self.input_transform(input_dict)
+
         # The following serves as a starting point where the PVs can be used for defining
         # motor positions. However, this is currently incompatible with tight input ranges.
         for name, motor in self.snd.motor_dict.items():
@@ -58,4 +72,7 @@ class SNDModel(LUMEBaseModel):
             'IP_cx': self.snd.get_IP_cx(),
             'IP_cy': self.snd.get_IP_cy()
         }
+
+        output_dict = self.output_transform(output_dict)
+
         return output_dict
