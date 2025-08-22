@@ -1,14 +1,20 @@
 import os
 from epics import caget
 
+
 class EPICSInterface:
     """Interface for interacting with EPICS Process Variables (PVs)."""
+
     def __init__(self):
         """Check environment variables."""
-        if 'EPICS_CA_ADDR_LIST' not in os.environ:
-            raise EnvironmentError("EPICS_CA_ADDR_LIST environment variable is not set.")
-        if 'EPICS_CA_AUTO_ADDR_LIST' not in os.environ:
-            raise EnvironmentError("EPICS_CA_AUTO_ADDR_LIST environment variable is not set.")
+        if "EPICS_CA_ADDR_LIST" not in os.environ:
+            raise EnvironmentError(
+                "EPICS_CA_ADDR_LIST environment variable is not set."
+            )
+        if "EPICS_CA_AUTO_ADDR_LIST" not in os.environ:
+            raise EnvironmentError(
+                "EPICS_CA_AUTO_ADDR_LIST environment variable is not set."
+            )
 
     def get_value(self, pv_name):
         """

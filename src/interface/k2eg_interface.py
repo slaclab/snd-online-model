@@ -23,9 +23,11 @@ class K2EGInterface:
         app_name : str
             The application name for the K2EG client (e.g., 'app-three').
         """
-        self.k2eg_client =  k2eg.dml(environment_id, app_name)
+        self.k2eg_client = k2eg.dml(environment_id, app_name)
 
-    def get_pv(self, pv_name: str, timeout: float = 5.0, proto: str = 'ca://') -> Scalar:
+    def get_pv(
+        self, pv_name: str, timeout: float = 5.0, proto: str = "ca://"
+    ) -> Scalar:
         """
         Retrieves the value of a process variable (PV) from K2EG.
 
@@ -46,7 +48,14 @@ class K2EGInterface:
         """
         return self.k2eg_client.get(proto + pv_name, timeout)["value"]
 
-    def put_pv(self, pv_name: str, value: float, timeout: float = 10.0, proto: str = 'ca://', type: str = 'scalar'):
+    def put_pv(
+        self,
+        pv_name: str,
+        value: float,
+        timeout: float = 10.0,
+        proto: str = "ca://",
+        type: str = "scalar",
+    ):
         """
         Writes a value to a process variable (PV) in K2EG.
 
@@ -62,13 +71,15 @@ class K2EGInterface:
             The protocol to use for the PV (default is 'ca://', which stands for Channel Access).
             Other options include 'pva://' for Process Variable Access.
         """
-        if type == 'scalar':
+        if type == "scalar":
             if not isinstance(value, float):
                 raise TypeError("Value must be an instance of Scalar.")
             serialized_value = Scalar("value", value)
         else:
             # Dict, lists and NTTable are supported in k2eg, but not implemented here.
-            raise NotImplemented(f"Unsupported type: {type}. Only 'scalar' is supported.")
+            raise NotImplementedError(
+                f"Unsupported type: {type}. Only 'scalar' is supported."
+            )
 
         self.k2eg_client.put(proto + pv_name, serialized_value, timeout)
 

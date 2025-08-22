@@ -1,8 +1,6 @@
 import numpy as np
 import logging
-import json
 from lume_model.base import LUMEBaseModel
-from lume_model.variables import ScalarVariable
 from lcls_beamline_toolbox.models.split_and_delay_motion import SND
 from pydantic import ConfigDict
 
@@ -10,16 +8,19 @@ logger = logging.getLogger(__name__)
 
 inputs = np.zeros(22)
 
+
 class SNDModel(LUMEBaseModel):
     model_config = ConfigDict(extra="allow")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        energy_idx = self.input_names.index("energy")
+        delay_idx = self.input_names.index("delay")
         self.snd = self.initialize_model(
-            energy=self.input_variables[0].default_value,
-            delay=self.input_variables[1].default_value
+            energy=self.input_variables[energy_idx].default_value,
+            delay=self.input_variables[delay_idx].default_value,
         )
-        self.pv_map = self.pv_mapping() # TODO: move this somewhere more static
+        self.pv_map = None
 
     def initialize_model(self, energy=10000, delay=0):
         """Initialize the model with default values for energy and delay."""
@@ -28,16 +29,10 @@ class SNDModel(LUMEBaseModel):
         self.snd = SND(energy, delay)
         return self.snd
 
-    def pv_mapping(self):
-        """Loads  the PV mapping from json file."""
-        with open('model/pv_mapping.json', 'r') as file:
-            pv_mapping = json.load(file)
-        return pv_mapping
-
     def input_transform(self, input_dict):
         """Transform input dictionary values from PV units to sim units."""
         return {
-            name: value * self.pv_map['unit_conversion'][name]
+            name: value * self.pv_map["unit_conversion"][name]
             for name, value in input_dict.items()
         }
 
@@ -46,8 +41,9 @@ class SNDModel(LUMEBaseModel):
         # TODO: Not sure if any transformation is needed here. Remove if not needed.
         return output_dict
 
-    def _evaluate(self, input_dict):
-        input_dict = self.input_transform(input_dict)
+    def _evaluate(self, input_dict, transform=True):
+        if transform:
+            input_dict = self.input_transform(input_dict)
 
         # The following serves as a starting point where the PVs can be used for defining
         # motor positions. However, this is currently incompatible with tight input ranges.
@@ -60,19 +56,20 @@ class SNDModel(LUMEBaseModel):
         self.snd.propagate_delay()
         self.snd.propagate_cc()
         output_dict = {
-            't1_dh_sum': self.snd.get_t1_dh_sum(),
-            'dd_sum': self.snd.get_dd_sum(),
-            't4_dh_sum': self.snd.get_t4_dh_sum(),
-            'do_sum': self.snd.get_do_sum(),
-            'dd_cx': self.snd.get_dd_cx(),
-            'dd_cy': self.snd.get_dd_cy(),
-            'do_cx': self.snd.get_do_cx(),
-            'do_cy': self.snd.get_do_cy(),
-            'IP_sum': self.snd.get_IP_sum(),
-            'IP_cx': self.snd.get_IP_cx(),
-            'IP_cy': self.snd.get_IP_cy()
+            "t1_dh_sum": self.snd.get_t1_dh_sum(),
+            "dd_sum": self.snd.get_dd_sum(),
+            "t4_dh_sum": self.snd.get_t4_dh_sum(),
+            "do_sum": self.snd.get_do_sum(),
+            "dd_cx": self.snd.get_dd_cx(),
+            "dd_cy": self.snd.get_dd_cy(),
+            "do_cx": self.snd.get_do_cx(),
+            "do_cy": self.snd.get_do_cy(),
+            "IP_sum": self.snd.get_IP_sum(),
+            "IP_cx": self.snd.get_IP_cx(),
+            "IP_cy": self.snd.get_IP_cy(),
         }
 
-        output_dict = self.output_transform(output_dict)
+        if transform:
+            output_dict = self.output_transform(output_dict)
 
         return output_dict
