@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: snd-model
-        image: scr.svc.stanford.edu/smiskov/snd-model:1.0.0
+        image: scr.svc.stanford.edu/smiskov/snd-model:latest
         imagePullPolicy: Always
         command: [ "/bin/bash", "-c" ]
         args: [ "sleep infinity" ]
