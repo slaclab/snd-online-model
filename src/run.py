@@ -198,7 +198,6 @@ def main():
         while True:
             try:
                 run_iteration(snd_model, interface, input_vars, args.interface)
-                time.sleep(5)
             except KeyboardInterrupt:
                 logger.info("Keyboard interrupt received. Exiting.")
                 exit(0)
