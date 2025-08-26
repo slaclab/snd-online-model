@@ -11,7 +11,7 @@ input_variables:
     variable_class: ScalarVariable
     default_value: 0.28
     is_constant: false
-    value_range: [0.0, 1.0]
+    value_range: [-100, 1300]
     value_range_tolerance: 1.0e-08
     unit: "ps"
   t1_tth:

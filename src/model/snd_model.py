@@ -93,16 +93,10 @@ class SNDModel(LUMEBaseModel):
         dict
             Dictionary of output variable names and their evaluated values.
         """
-        if transform:
-            input_dict = self.input_transform(input_dict)
-
         # The following serves as a starting point where the PVs can be used for defining
         # motor positions. However, this is currently incompatible with tight input ranges.
         for name, motor in self.snd.motor_dict.items():
-            default_pos = motor.wm()
-            pv_pos = input_dict[name]
-            offset = pv_pos - default_pos  # TODO: what is the offset for?
-            motor.mv(pv_pos)
+            motor.mv(input_dict[name])
 
         self.snd.propagate_delay()
         self.snd.propagate_cc()
@@ -119,8 +113,5 @@ class SNDModel(LUMEBaseModel):
             "IP_cx": self.snd.get_IP_cx(),
             "IP_cy": self.snd.get_IP_cy(),
         }
-
-        if transform:
-            output_dict = self.output_transform(output_dict)
 
         return output_dict

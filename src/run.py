@@ -28,8 +28,10 @@ def get_interface(interface_name):
 
 def get_input_vars(snd_model, interface_name):
     if interface_name == "test":
+        # Use model input variable objects
         return snd_model.input_variables
     elif interface_name == "epics":
+        # Use PV names from the model's pv_map
         return [snd_model.pv_map["name"][n] for n in snd_model.input_names]
     else:
         raise ValueError(f"Unknown interface: {interface_name}")
@@ -66,27 +68,31 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
     # Get the input variable from the interface
     input_dict = interface.get_input_variables(input_vars)
     if interface_name == "epics":
-        # Map PVs to model input names
+        # Map PVs back to model input names
         input_dict = {
             snd_model.input_names[i]: input_dict[pv] for i, pv in enumerate(input_vars)
         }
     logger.debug("Input values: %s", MultiLineDict(input_dict))
 
     # Check if energy has changed too much from the default value
-    energy_change_threshold = 100  # eV
+    energy_change_threshold = 1  # eV
+    delay_change_threshold = 0.1  # ps
     energy_idx = snd_model.input_names.index("energy")
     delay_idx = snd_model.input_names.index("delay")
 
     if (
         abs(input_dict["energy"] - snd_model.input_variables[energy_idx].default_value)
         > energy_change_threshold
+        or abs(input_dict["delay"] - snd_model.input_variables[delay_idx].default_value)
+        > delay_change_threshold
     ):
-        logger.info("Energy has changed significantly, reinstantiating model.")
+        logger.info("Energy or delay has changed significantly, reinstantiating model.")
         logger.info(
             f"Default energy: {snd_model.input_variables[energy_idx].default_value}."
         )
-        logger.info(f"Input energy: {input_dict['energy']}.")
-        # TODO: Do the same for delay. For now use the input value for delay.
+        logger.info(
+            f"Default delay: {snd_model.input_variables[delay_idx].default_value}."
+        )
         snd_model.initialize_model(
             energy=input_dict["energy"], delay=input_dict["delay"]
         )
@@ -103,7 +109,12 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
 
         # Update default value for each motor/each input based on new energy
         # this is needed here for validation of the input range (will only throw a warning)
+        logger.info("Updating default values for all motors based on new energy/delay.")
         for name, motor in snd_model.snd.motor_dict.items():
+            # Disable validation for all inputs temporarily, since these are not scaled to simulation units yet
+            snd_model.input_validation_config = {
+                k: "none" for k in snd_model.input_names
+            }
             snd_model.input_variables[
                 snd_model.input_names.index(name)
             ].default_value = motor.wm()
@@ -119,8 +130,12 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
             )
             logger.debug("Updated input values: %s", MultiLineDict(input_dict))
 
-    # Evaluate the model with the random input
-    output = snd_model.evaluate(input_dict, transform=(interface_name == "epics"))
+    # Evaluate the model with the input
+    snd_model.input_validation_config = {k: "warn" for k in snd_model.input_names}
+    if interface_name == "epics":
+        # Transform input from PV units to simulation units
+        input_dict = snd_model.input_transform(input_dict)
+    output = snd_model.evaluate(input_dict)
     logger.debug("Output values: %s", MultiLineDict(output))
 
 
