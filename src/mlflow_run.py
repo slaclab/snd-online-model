@@ -8,10 +8,12 @@ Classes
 MLflowRun
     Context manager for MLflow runs, automatically sets up experiment and run naming.
 """
+
 import logging
 import mlflow
 
 logger = logging.getLogger(__name__)
+
 
 class MLflowRun:
     """
@@ -29,6 +31,7 @@ class MLflowRun:
     run_prefix : str, optional
         Prefix for run names to distinguish runs.
     """
+
     def __init__(
         self,
         tracking_uri="https://ard-mlflow.slac.stanford.edu",

@@ -7,7 +7,12 @@ from mlflow_run import MLflowRun
 from model.snd_model import SNDModel
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    handlers=[logging.FileHandler("snd_run.log"), logging.StreamHandler()],
+    format="%(asctime)s,%(msecs)03d %(name)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.DEBUG,
+)
 logger = logging.getLogger(__name__)
 
 
@@ -75,7 +80,8 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
         logger.debug(f"Raw input values from EPICS: {MultiLineDict(input_dict)}")
         posixseconds = int(max(d["posixseconds"] for d in input_dict.values()))
         input_dict = {
-            snd_model.input_names[i]: input_dict[pv]["value"] for i, pv in enumerate(input_vars)
+            snd_model.input_names[i]: input_dict[pv]["value"]
+            for i, pv in enumerate(input_vars)
         }
     logger.debug("Input values: %s", MultiLineDict(input_dict))
 
@@ -147,7 +153,10 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
 
     # Log input after transformation and output
     # one line to log at same timestamp
-    mlflow.log_metrics(input_dict | output, timestamp=(posixseconds*1000 if interface_name == "epics" else None))
+    mlflow.log_metrics(
+        input_dict | output,
+        timestamp=(posixseconds * 1000 if interface_name == "epics" else None),
+    )
     logger.debug("Output values: %s", MultiLineDict(output))
 
 
@@ -181,7 +190,9 @@ def main():
     snd_model = SNDModel("model/snd_model.yml")
     snd_model.pv_map = pv_mapping()
     input_vars = get_input_vars(snd_model, args.interface)
-    interface = get_interface(args.interface, input_vars if args.interface == "epics" else None)
+    interface = get_interface(
+        args.interface, input_vars if args.interface == "epics" else None
+    )
 
     with MLflowRun() as run:
         while True:

@@ -61,10 +61,7 @@ class EPICSInterface:
                     value = pv.get()
                     timestamp = time_data["posixseconds"]
 
-                    results[pv.pvname] = {
-                        "value": value,
-                        "posixseconds": timestamp
-                    }
+                    results[pv.pvname] = {"value": value, "posixseconds": timestamp}
                 else:
                     results[pv.pvname] = {"error": "Connection failed"}
             except Exception as e:
