@@ -5,7 +5,7 @@ import epics
 class EPICSInterface:
     """Interface for interacting with EPICS Process Variables (PVs)."""
 
-    def __init__(self):
+    def __init__(self, pv_name_list=None):
         """Check environment variables."""
         if "EPICS_CA_ADDR_LIST" not in os.environ:
             raise EnvironmentError(
@@ -16,6 +16,8 @@ class EPICSInterface:
                 "EPICS_CA_AUTO_ADDR_LIST environment variable is not set."
             )
         self.pv_objects = None
+        if pv_name_list is not None:
+            self.create_pvs(pv_name_list)
 
     def create_pvs(self, pv_name_list):
         """
@@ -56,14 +58,15 @@ class EPICSInterface:
                     time_data = pv.get_timevars()
 
                     # Extract value and timestamp
-                    value = time_data.get('value')
-                    timestamp = time_data.get('posixseconds')
+                    value = pv.get()
+                    timestamp = time_data["posixseconds"]
 
                     results[pv.pvname] = {
-                        'value': value,
-                        'posixseconds': timestamp
+                        "value": value,
+                        "posixseconds": timestamp
                     }
                 else:
-                    results[pv.pvname] = {'error': 'Connection failed'}
+                    results[pv.pvname] = {"error": "Connection failed"}
             except Exception as e:
-                results[pv.pvname] = {'error': str(e)}
+                results[pv.pvname] = {"error": str(e)}
+        return results

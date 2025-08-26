@@ -72,10 +72,11 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
     input_dict = interface.get_input_variables(input_vars)
     if interface_name == "epics":
         # Map PVs back to model input names
+        logger.debug(f"Raw input values from EPICS: {MultiLineDict(input_dict)}")
+        posixseconds = int(max(d["posixseconds"] for d in input_dict.values()))
         input_dict = {
             snd_model.input_names[i]: input_dict[pv]["value"] for i, pv in enumerate(input_vars)
         }
-        posixseconds = min(d['posixseconds'] for d in input_dict.values())
     logger.debug("Input values: %s", MultiLineDict(input_dict))
 
     # Check if energy has changed too much from the default value
