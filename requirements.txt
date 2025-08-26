@@ -1,3 +1,4 @@
 pyepics
 lume-model
+mlflow<3.0
 lcls_beamline_toolbox @ git+https://github.com/mseaberg/lcls_beamline_toolbox.git@master

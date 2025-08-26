@@ -2,7 +2,10 @@ import argparse
 import logging
 import time
 import collections
+import mlflow
+from mlflow_run import MLflowRun
 from model.snd_model import SNDModel
+
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -13,7 +16,7 @@ class MultiLineDict(collections.UserDict):
         return "\n" + "\n".join(f"{k} = {v}" for k, v in self.data.items())
 
 
-def get_interface(interface_name):
+def get_interface(interface_name, pvname_list=None):
     if interface_name == "test":
         from interface.test_interface import TestInterface
 
@@ -21,7 +24,7 @@ def get_interface(interface_name):
     elif interface_name == "epics":
         from interface.epics_interface import EPICSInterface
 
-        return EPICSInterface()
+        return EPICSInterface(pvname_list)
     else:
         raise ValueError(f"Unknown interface: {interface_name}")
 
@@ -70,8 +73,9 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
     if interface_name == "epics":
         # Map PVs back to model input names
         input_dict = {
-            snd_model.input_names[i]: input_dict[pv] for i, pv in enumerate(input_vars)
+            snd_model.input_names[i]: input_dict[pv]["value"] for i, pv in enumerate(input_vars)
         }
+        posixseconds = min(d['posixseconds'] for d in input_dict.values())
     logger.debug("Input values: %s", MultiLineDict(input_dict))
 
     # Check if energy has changed too much from the default value
@@ -135,7 +139,14 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
     if interface_name == "epics":
         # Transform input from PV units to simulation units
         input_dict = snd_model.input_transform(input_dict)
+        logger.debug("Transformed input values: %s", MultiLineDict(input_dict))
+
+    # Evaluate the model
     output = snd_model.evaluate(input_dict)
+
+    # Log input after transformation and output
+    # one line to log at same timestamp
+    mlflow.log_metrics(input_dict | output, timestamp=(posixseconds*1000 if interface_name == "epics" else None))
     logger.debug("Output values: %s", MultiLineDict(output))
 
 
@@ -168,19 +179,21 @@ def main():
     logger.info("Running with interface: %s", args.interface)
     snd_model = SNDModel("model/snd_model.yml")
     snd_model.pv_map = pv_mapping()
-    interface = get_interface(args.interface)
     input_vars = get_input_vars(snd_model, args.interface)
-    while True:
-        try:
-            run_iteration(snd_model, interface, input_vars, args.interface)
-            time.sleep(5)
-        except KeyboardInterrupt:
-            logger.info("Keyboard interrupt received. Exiting.")
-            exit(0)
-        except Exception as e:
-            logger.error(f"An error occurred: {e}")
-            logger.info("Retrying in 5 seconds...")
-            time.sleep(5)
+    interface = get_interface(args.interface, input_vars if args.interface == "epics" else None)
+
+    with MLflowRun() as run:
+        while True:
+            try:
+                run_iteration(snd_model, interface, input_vars, args.interface)
+                time.sleep(5)
+            except KeyboardInterrupt:
+                logger.info("Keyboard interrupt received. Exiting.")
+                exit(0)
+            except Exception as e:
+                logger.error(f"An error occurred: {e}")
+                logger.info("Retrying in 5 seconds...")
+                time.sleep(5)
 
 
 if __name__ == "__main__":

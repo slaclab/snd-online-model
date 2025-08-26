@@ -1,5 +1,5 @@
 import os
-from epics import caget
+import epics
 
 
 class EPICSInterface:
@@ -15,35 +15,55 @@ class EPICSInterface:
             raise EnvironmentError(
                 "EPICS_CA_AUTO_ADDR_LIST environment variable is not set."
             )
+        self.pv_objects = None
 
-    def get_value(self, pv_name):
+    def create_pvs(self, pv_name_list):
         """
-        Get the value of a Process Variable (PV) from EPICS.
+        Create a list of PV objects.
 
         Parameters
         ----------
-        pv_name : str
-            The name of the PV to retrieve.
+        pv_name_list : list of str
+            A list of PV names to create.
 
         Returns
         -------
-        value
-            The value of the PV.
+        list
+            A dict of EPICS PV objects.
         """
-        return caget(pv_name)
+        self.pv_objects = {name: epics.PV(name) for name in pv_name_list}
 
     def get_input_variables(self, input_pvs: list) -> dict:
         """
-        Retrieves the input variables from EPICS.
+        Retrieve values and timestamps for a list of EPICS input PVs.
 
         Parameters
         ----------
         input_pvs : list of str
-            A list of input variable names to retrieve.
+            List of EPICS PV names to retrieve values for.
 
         Returns
         -------
         dict
-            A dictionary with PV names as keys and their values as values.
+            Dictionary mapping PV names to their values and POSIX timestamps, or error info if retrieval fails.
         """
-        return {pv: self.get_value(pv) for pv in input_pvs}
+        results = {}
+        for pv in input_pvs:
+            pv = self.pv_objects[pv]
+            try:
+                # Wait for the connection to be established
+                if pv.wait_for_connection(timeout=5):
+                    time_data = pv.get_timevars()
+
+                    # Extract value and timestamp
+                    value = time_data.get('value')
+                    timestamp = time_data.get('posixseconds')
+
+                    results[pv.pvname] = {
+                        'value': value,
+                        'posixseconds': timestamp
+                    }
+                else:
+                    results[pv.pvname] = {'error': 'Connection failed'}
+            except Exception as e:
+                results[pv.pvname] = {'error': str(e)}
