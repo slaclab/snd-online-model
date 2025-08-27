@@ -2,6 +2,7 @@ import argparse
 import logging
 import time
 import collections
+import numpy as np
 import mlflow
 from mlflow_run import MLflowRun
 from model.snd_model import SNDModel
@@ -85,16 +86,16 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
         }
     logger.debug("Input values: %s", MultiLineDict(input_dict))
 
-    # Check if energy has changed too much from the default value
-    energy_change_threshold = 1  # eV
+    # Check if t1_tth or delay have changed too much from the default value
+    # if so, we need to reinitialize the model and obtain new defaults and ranges
     delay_change_threshold = 0.1  # ps
-    energy_idx = snd_model.input_names.index("energy")
     delay_idx = snd_model.input_names.index("delay")
     t1_tth_idx = snd_model.input_names.index("t1_tth")
-    theta_change_threshold = 2e-4
+    theta_change_threshold = 3.49e-06 # radians
+    t1_tth_input_sim_units = np.deg2rad(input_dict["t1_tth"]) if interface_name == "epics" else input_dict["t1_tth"]
 
     if (
-        abs(input_dict["t1_tth"] - snd_model.input_variables[t1_tth_idx].default_value)
+        abs(t1_tth_input_sim_units - snd_model.input_variables[t1_tth_idx].default_value)
         > theta_change_threshold
         or abs(input_dict["delay"] - snd_model.input_variables[delay_idx].default_value)
         > delay_change_threshold
@@ -107,14 +108,14 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
             f"Default delay: {snd_model.input_variables[delay_idx].default_value}."
         )
         snd_model.initialize_model(
-            two_theta=input_dict["energy"], delay=input_dict["delay"]
+            two_theta=t1_tth_input_sim_units, delay=input_dict["delay"]
         )
 
         # Set new default energy and delay
-        snd_model.input_variables[t1_tth_idx].default_value = input_dict["t1_tth"]
+        snd_model.input_variables[t1_tth_idx].default_value = t1_tth_input_sim_units
         snd_model.input_variables[delay_idx].default_value = input_dict["delay"]
         logger.info(
-            f"New default t1_tth is {snd_model.input_variables[t1_tth_idx].default_value}."
+            f"New t1_tth is {snd_model.input_variables[t1_tth_idx].default_value}."
         )
         logger.info(
             f"New delay is {snd_model.input_variables[delay_idx].default_value}."
@@ -122,7 +123,7 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
 
         # Update default value for each motor/each input based on new energy
         # this is needed here for validation of the input range (will only throw a warning)
-        logger.info("Updating default values for all motors based on new energy/delay.")
+        logger.info("Updating default values for all motors based on new t1_tth/delay.")
         for name, motor in snd_model.snd.motor_dict.items():
             # Disable validation for all inputs temporarily, since these are not scaled to simulation units yet
             snd_model.input_validation_config = {

@@ -22,23 +22,23 @@ class SNDModel(LUMEBaseModel):
         )
         self.pv_map = None
 
-    def initialize_model(self, two_theta=37.674, delay=0):
+    def initialize_model(self, two_theta=0.6575353, delay=0):
         """
-        Initialize the model with default values for energy and delay.
+        Initialize the model with default values for crystal position and delay. Units are in simulation units.
 
         Parameters
         ----------
-        energy : float, optional
-            Photon energy value to initialize the model (default is 10000).
+        t1_tth : float, optional
+            Crystal position value to initialize the model in radians (default is 0.657).
         delay : float, optional
-            Delay value to initialize the model (default is 0).
+            Delay value to initialize the model in ps (default is 0).
 
         Returns
         -------
         SND
             The initialized SND model instance.
         """
-        self.snd = SND(two_theta=np.deg2rad(two_theta), delay=delay)
+        self.snd = SND(two_theta=two_theta, delay=delay)
         return self.snd
 
     def input_transform(self, input_dict):
@@ -93,8 +93,6 @@ class SNDModel(LUMEBaseModel):
         dict
             Dictionary of output variable names and their evaluated values.
         """
-        # The following serves as a starting point where the PVs can be used for defining
-        # motor positions. However, this is currently incompatible with tight input ranges.
         for name, motor in self.snd.motor_dict.items():
             motor.mv(input_dict[name])
 
