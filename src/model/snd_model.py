@@ -14,15 +14,15 @@ class SNDModel(LUMEBaseModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        energy_idx = self.input_names.index("energy")
+        t1_tth_idx = self.input_names.index("t1_tth")
         delay_idx = self.input_names.index("delay")
         self.snd = self.initialize_model(
-            energy=self.input_variables[energy_idx].default_value,
+            two_theta=self.input_variables[t1_tth_idx].default_value,
             delay=self.input_variables[delay_idx].default_value,
         )
         self.pv_map = None
 
-    def initialize_model(self, energy=10000, delay=0):
+    def initialize_model(self, two_theta=37.674, delay=0):
         """
         Initialize the model with default values for energy and delay.
 
@@ -38,7 +38,7 @@ class SNDModel(LUMEBaseModel):
         SND
             The initialized SND model instance.
         """
-        self.snd = SND(energy, delay)
+        self.snd = SND(two_theta=np.deg2rad(two_theta), delay=delay)
         return self.snd
 
     def input_transform(self, input_dict):

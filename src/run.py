@@ -90,29 +90,31 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
     delay_change_threshold = 0.1  # ps
     energy_idx = snd_model.input_names.index("energy")
     delay_idx = snd_model.input_names.index("delay")
+    t1_tth_idx = snd_model.input_names.index("t1_tth")
+    theta_change_threshold = 2e-4
 
     if (
-        abs(input_dict["energy"] - snd_model.input_variables[energy_idx].default_value)
-        > energy_change_threshold
+        abs(input_dict["t1_tth"] - snd_model.input_variables[t1_tth_idx].default_value)
+        > theta_change_threshold
         or abs(input_dict["delay"] - snd_model.input_variables[delay_idx].default_value)
         > delay_change_threshold
     ):
-        logger.info("Energy or delay has changed significantly, reinstantiating model.")
+        logger.info("t1_tth or delay has changed significantly, reinstantiating model.")
         logger.info(
-            f"Default energy: {snd_model.input_variables[energy_idx].default_value}."
+            f"Default t1_tth: {snd_model.input_variables[t1_tth_idx].default_value}."
         )
         logger.info(
             f"Default delay: {snd_model.input_variables[delay_idx].default_value}."
         )
         snd_model.initialize_model(
-            energy=input_dict["energy"], delay=input_dict["delay"]
+            two_theta=input_dict["energy"], delay=input_dict["delay"]
         )
 
         # Set new default energy and delay
-        snd_model.input_variables[energy_idx].default_value = input_dict["energy"]
+        snd_model.input_variables[t1_tth_idx].default_value = input_dict["t1_tth"]
         snd_model.input_variables[delay_idx].default_value = input_dict["delay"]
         logger.info(
-            f"New default energy is {snd_model.input_variables[energy_idx].default_value}."
+            f"New default t1_tth is {snd_model.input_variables[t1_tth_idx].default_value}."
         )
         logger.info(
             f"New delay is {snd_model.input_variables[delay_idx].default_value}."
@@ -137,7 +139,7 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
         if interface_name == "test":
             # Get new input variables from the interface, skipping the first two (energy and delay)
             input_dict = interface.get_input_variables(
-                [x for x in input_vars if x not in ["energy", "delay"]]
+                [x for x in input_vars if x not in ["t1_tth", "delay"]]
             )
             logger.debug("Updated input values: %s", MultiLineDict(input_dict))
 
