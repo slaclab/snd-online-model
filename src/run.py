@@ -102,10 +102,16 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
     ):
         logger.info("t1_tth or delay has changed significantly, reinstantiating model.")
         logger.info(
-            f"Default t1_tth: {snd_model.input_variables[t1_tth_idx].default_value}."
+            f"Old t1_tth: {snd_model.input_variables[t1_tth_idx].default_value}."
         )
         logger.info(
-            f"Default delay: {snd_model.input_variables[delay_idx].default_value}."
+            f"New t1_tth: {t1_tth_input_sim_units}."
+        )
+        logger.info(
+            f"Old delay: {snd_model.input_variables[delay_idx].default_value}."
+        )
+        logger.info(
+            f"New delay: {input_dict['delay']}."
         )
         snd_model.initialize_model(
             two_theta=t1_tth_input_sim_units, delay=input_dict["delay"]
@@ -114,21 +120,15 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
         # Set new default energy and delay
         snd_model.input_variables[t1_tth_idx].default_value = t1_tth_input_sim_units
         snd_model.input_variables[delay_idx].default_value = input_dict["delay"]
-        logger.info(
-            f"New t1_tth is {snd_model.input_variables[t1_tth_idx].default_value}."
-        )
-        logger.info(
-            f"New delay is {snd_model.input_variables[delay_idx].default_value}."
-        )
 
         # Update default value for each motor/each input based on new energy
         # this is needed here for validation of the input range (will only throw a warning)
         logger.info("Updating default values for all motors based on new t1_tth/delay.")
+        # Disable validation for all inputs temporarily, since these are not scaled to simulation units yet
+        snd_model.input_validation_config = {
+            k: "none" for k in snd_model.input_names
+        }
         for name, motor in snd_model.snd.motor_dict.items():
-            # Disable validation for all inputs temporarily, since these are not scaled to simulation units yet
-            snd_model.input_validation_config = {
-                k: "none" for k in snd_model.input_names
-            }
             snd_model.input_variables[
                 snd_model.input_names.index(name)
             ].default_value = motor.wm()
@@ -138,10 +138,11 @@ def run_iteration(snd_model, interface, input_vars, interface_name):
             ]
 
         if interface_name == "test":
-            # Get new input variables from the interface, skipping the first two (energy and delay)
+            # Get new input variables from the interface, skipping t1_tth and delay
             input_dict = interface.get_input_variables(
-                [x for x in input_vars if x not in ["t1_tth", "delay"]]
+                [x for x in input_vars if x.name not in ["t1_tth", "delay"]]
             )
+            input_dict["t1_tth"] = t1_tth_input_sim_units # add back default t1_tth
             logger.debug("Updated input values: %s", MultiLineDict(input_dict))
 
     # Evaluate the model with the input
